@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios, { post } from 'axios';
+import post from 'axios';
 
 //https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
 class AddNewDataset extends Component {

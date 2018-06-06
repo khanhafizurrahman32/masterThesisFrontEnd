@@ -5,7 +5,8 @@ class DataSetSelection extends Component {
   constructor(props){
     super(props);
     this.state = {
-      receiveValues: []
+      receiveValues: [],
+      selectedDataSet: ''
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -13,11 +14,12 @@ class DataSetSelection extends Component {
   }
 
   handleChange(event) {
+    this.setState({selectedDataSet: event.target.value});
     console.log(event.target.value);
   }
 
   handleSubmit(event){
-    console.log(this.state.value)
+    console.log(this.state.selectedDataSet)
     event.preventDefault();
   }
 
@@ -33,16 +35,14 @@ class DataSetSelection extends Component {
       success: function(data){
         let items = [];
         for (let i =0; i<data.length; i++){
-          console.log(data[i].id);
           items.push(<option key={data[i].id} value={data[i].fileName}>{data[i].fileName}</option>);
         }
         this.setState({receiveValues: items}, function(){
-          console.log(this.state);
         });
       }.bind(this),
       error: function(xhr, status, err){
         console.log('', status, err);
-      }
+      }.bind(this)
     });
   }
 
