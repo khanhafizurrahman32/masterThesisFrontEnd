@@ -9,6 +9,7 @@ class MultipleFormInput extends Component {
       select_datasets:'',
       vizualization_method:'',
       topic_name:'',
+      topic_output_name:'',
       receiveValues: [], // state: DataSetSelection
       selectedDataSet: '', // state: DataSetSelection
       selectedOption: ''
@@ -29,7 +30,10 @@ class MultipleFormInput extends Component {
       sessionStorage.setItem('visualizationMethod', target.value);
       value = target.value
     }else if (target.type === 'text') {
-      value = target.value
+      value = target.value;
+      let v = value + "_output"
+      this.setState({topic_output_name: v})
+      console.log("v: "+v);
     }else {
       sessionStorage.setItem('currentFile', target.value);
       value = target.value
@@ -49,25 +53,18 @@ class MultipleFormInput extends Component {
   }
 
   createTopic(event){
-    event.preventDefault();
-    console.log(this.state.topic_name);
-    this.createKafkaBackend(this.state.topic_name).then((response) => {
-      //console.log(response.data);
-    }).catch((fromReject) => {
-      console.log(fromReject);
-    })
-  }
-
-  createKafkaBackend(topic_name){
-    const url = 'http://localhost:8080/upload/startKafkaCommandShell'
-    const formData = new FormData();
-    formData.append('topicName', topic_name)
-    const config = {
-      headers: {
-        'content-type': 'text/plain'
-      }
-    }
-    return post(url, formData, config)
+    
+    // need to set output topic into a state
+    $.ajax({
+      url: "http://localhost:8080/upload/startKafkaCommandShell",
+      cache: 'false',
+      method: 'POST',
+      data: {topicName: this.state.topic_name, outputTopicName: this.state.topic_output_name},
+      success: function(data){
+      }.bind(this),
+      error: function(xhr, status, err){
+      }.bind(this)
+    });
   }
 
   sendDatatoTopic(event){
@@ -101,7 +98,7 @@ class MultipleFormInput extends Component {
       url: "http://localhost:8080/upload/startPythonCommandShell",
       cache: 'false',
       method: 'POST',
-      data: {app_name:'learning01', master_server:'local', kafka_bootstrap_server: '127.0.0.1:9092', subscribe_topic: this.state.topic_name },
+      data: {app_name:'learning01', master_server:'local', kafka_bootstrap_server: '127.0.0.1:9092', subscribe_topic: this.state.topic_name,  subscribe_output_topic: this.state.topic_output_name},
       success: function(data){
       }.bind(this),
       error: function(xhr, status, err){
@@ -172,7 +169,7 @@ class MultipleFormInput extends Component {
           </label>
         </div>
         <br />
-        <label> Name of the Topic: </label> &nbsp; &nbsp;
+        <label> Name of the Topic: {this.state.topic_output_name} </label> &nbsp; &nbsp;
         <input type="text" name = "topic_name" placeholder="topic_name" onChange={this.handleInputChange}></input>
         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
         <input type="button" onClick={this.createTopic} value="createTopic!" />
